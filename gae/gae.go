@@ -32,8 +32,8 @@ const (
 )
 
 func IsBinary(b []byte) bool {
-	if len(b) > 512 {
-		b = b[:512]
+	if len(b) > 128 {
+		b = b[:128]
 	}
 	for _, c := range b {
 		if c > 0x7f {
