@@ -280,17 +280,17 @@ func handler(rw http.ResponseWriter, r *http.Request) {
 	if resp.ContentLength > 0 {
 		resp.Header.Set("Content-Length", strconv.FormatInt(resp.ContentLength, 10))
 	}
-	if s := resp.Header.Get("Content-Type"); strings.HasPrefix(s, "text/") ||
-		strings.HasPrefix(s, "application/json") ||
-		strings.HasPrefix(s, "application/x-javascript") ||
-		strings.HasPrefix(s, "application/javascript") {
-		if resp.Header.Get("Content-Encoding") == "" {
+	if resp.Header.Get("Content-Encoding") == "" {
+		if s := resp.Header.Get("Content-Type"); strings.HasPrefix(s, "text/") ||
+			strings.HasPrefix(s, "application/json") ||
+			strings.HasPrefix(s, "application/x-javascript") ||
+			strings.HasPrefix(s, "application/javascript") {
 			if v := reflect.ValueOf(resp.Body).Elem().FieldByName("content"); v.IsValid() {
 				b := v.Bytes()
 				switch {
 				case IsGzip(b):
 					resp.Header.Set("Content-Encoding", "gzip")
-				case IsBinary(b):
+				case IsBinary(b) && strings.Contains(req.Header.Get("Accept-Encoding"), "deflate"):
 					resp.Header.Set("Content-Encoding", "deflate")
 				}
 			}
